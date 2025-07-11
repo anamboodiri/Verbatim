@@ -1,0 +1,171 @@
+/* Enhanced App.css to match CodeFour.us design style with dropdown search styling */
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at center, #232946 0%, #121212 100%);
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  color: #f4f4f4;
+}
+
+.App {
+  max-width: 800px;
+  margin: 4rem auto;
+  background: rgba(30, 32, 44, 0.98);
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+  transition: box-shadow 0.3s ease-in-out;
+  border: 1.5px solid #232946;
+}
+
+h1 {
+  margin: 0 0 2.5rem;
+  font-size: 2.4rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #3a7afe;
+  text-align: center;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px #3a7afe99, 0 0 24px #3a7afe55, 0 0 40px #004aad33;
+}
+
+label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e0e6ed;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+textarea,
+select {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 1rem;
+  font-size: 1.05rem;
+  border: 1.5px solid #232946;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background-color: #181a20;
+  color: #f4f4f4;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 0.5rem;
+}
+
+textarea:focus,
+select:focus {
+  border-color: #3a7afe;
+  outline: none;
+  box-shadow: 0 0 0 2px #3a7afe33;
+}
+
+button {
+  margin-top: 2rem;
+  padding: 1rem 2.2rem;
+  font-size: 1.1rem;
+  background: linear-gradient(90deg, #3a7afe 0%, #004aad 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px 0 #3a7afe22;
+}
+
+button:hover:not(:disabled) {
+  background: linear-gradient(90deg, #004aad 0%, #3a7afe 100%);
+  transform: scale(1.03);
+  box-shadow: 0 4px 16px 0 #3a7afe33;
+}
+
+button:disabled {
+  background: #232946;
+  color: #a0aec0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.form-group {
+  margin-bottom: 2rem;
+}
+
+.response {
+  margin-top: 3rem;
+  padding: 2rem 1.5rem;
+  background: rgba(36, 40, 54, 0.98);
+  border-left: 4px solid #3a7afe;
+  border-radius: 10px;
+  line-height: 1.7;
+  font-size: 1.08rem;
+  color: #e0e6ed;
+  animation: fadeIn 0.5s ease-in-out;
+  box-shadow: 0 2px 12px 0 #3a7afe11;
+}
+
+.response a {
+  color: #3a7afe;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.response a:hover {
+  text-decoration: underline;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optional: Fixed header */
+.header {
+  background-color: #fff;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  color: #0066cc;
+}
+
+.header nav a {
+  margin-left: 2rem;
+  text-decoration: none;
+  font-weight: 500;
+  color: #333;
+}
+
+.header nav a:hover {
+  color: #0066cc;
+}
+
+.subtitle {
+  color: #bfc8e6;
+  font-size: 1.08rem;
+  text-align: center;
+  margin: -1.2rem 0 2.5rem 0;
+  line-height: 1.6;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}

@@ -1,12 +1,15 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import requests
 import os
+import re
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 
 # Get API key from environment variable
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
@@ -63,7 +66,6 @@ They want an answer based on **{jurisdiction}** law. Provide:
     try:
         response = requests.post("https://api.anthropic.com/v1/messages", headers=headers, json=payload)
         
-        # Check if request was successful
         if response.status_code != 200:
             print(f"❌ API Error: {response.status_code} - {response.text}")
             return jsonify({
@@ -74,9 +76,24 @@ They want an answer based on **{jurisdiction}** law. Provide:
         result = response.json()
         print("🔍 RAW Anthropic response:", result)
 
-        # Extract the actual content from the response
         if "content" in result and len(result["content"]) > 0:
-            ai_response = result["content"][0]["text"]
+            raw_text = result["content"][0]["text"]
+
+            # Clean up formatting
+            formatted = raw_text.replace("\n\n", "<br><br>").replace("\n- ", "<br>• ").replace("\n", "<br>")
+            formatted = formatted.replace("1. ", "<br><strong>1. ").replace("2. ", "</strong><br><strong>2. ")
+            formatted = formatted.replace("3. ", "</strong><br><strong>3. ").replace("4. ", "</strong><br><strong>4. ")
+            formatted += "</strong>"
+
+            # Make URLs clickable
+            formatted = re.sub(r'(https?://[^\s<]+)', r'<a href="\1" target="_blank">\1</a>', formatted)
+
+            # Remove unnecessary filler text from Claude
+            formatted = formatted.replace(
+                "Unfortunately I'm unable to directly access the provided links at this time.", ""
+            )
+
+            ai_response = f'<div class="legal-response">{formatted}</div>'
         else:
             ai_response = "No response content available"
 
