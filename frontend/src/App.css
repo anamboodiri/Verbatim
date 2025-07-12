@@ -96,14 +96,13 @@ button:disabled {
 .response {
   margin-top: 3rem;
   padding: 2rem 1.5rem;
-  background: rgba(36, 40, 54, 0.98);
+  background: #232946;
   border-left: 4px solid #3a7afe;
   border-radius: 10px;
   line-height: 1.7;
   font-size: 1.08rem;
   color: #e0e6ed;
   animation: fadeIn 0.5s ease-in-out;
-  box-shadow: 0 2px 12px 0 #3a7afe11;
 }
 
 .response a {

@@ -26,13 +26,13 @@ def home():
 @app.route('/query', methods=['POST'])
 def query_legal_ai():
     data = request.get_json()
-    
+
     if not data:
         return jsonify({"error": "No JSON data provided"}), 400
-    
+
     query = data.get("query")
     jurisdiction = data.get("jurisdiction", "Federal")
-    
+
     if not query:
         return jsonify({"error": "Query is required"}), 400
 
@@ -49,6 +49,8 @@ They want an answer based on **{jurisdiction}** law. Provide:
 4. Related statutes from:
    - https://codes.findlaw.com/
    - https://www.ncsl.org/civil-and-criminal-justice/policing-legislation-database
+
+If the user query is ambiguous or lacks detail, respond only with a clarifying question before attempting an answer.
 """
 
     headers = {
@@ -65,14 +67,14 @@ They want an answer based on **{jurisdiction}** law. Provide:
 
     try:
         response = requests.post("https://api.anthropic.com/v1/messages", headers=headers, json=payload)
-        
+
         if response.status_code != 200:
             print(f"❌ API Error: {response.status_code} - {response.text}")
             return jsonify({
                 "error": f"API request failed with status {response.status_code}",
                 "details": response.text
             }), 500
-        
+
         result = response.json()
         print("🔍 RAW Anthropic response:", result)
 

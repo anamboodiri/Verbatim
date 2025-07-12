@@ -16,24 +16,43 @@ const allStates = [
 function App() {
   const [query, setQuery] = useState('');
   const [jurisdiction, setJurisdiction] = useState('');
-  const [response, setResponse] = useState('');
+  const [conversation, setConversation] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!query || !jurisdiction) return;
+
     setLoading(true);
-    setResponse('');
+    const userMessage = { role: 'user', text: query };
+    setConversation((prev) => [...prev, userMessage]);
+
     try {
       const res = await axios.post('http://127.0.0.1:5000/query', {
         query,
         jurisdiction
       });
-      setResponse(res.data.response);
+
+      const aiText = res.data.response;
+      const isFollowUp = /clarify|do you mean|more detail|unsure|unclear/i.test(aiText);
+      const aiMessage = {
+        role: isFollowUp ? 'followup' : 'ai',
+        text: aiText
+      };
+
+      setConversation((prev) => [...prev, aiMessage]);
     } catch (error) {
-      setResponse('❌ Error fetching response. Please try again.');
+      setConversation((prev) => [...prev, { role: 'error', text: '❌ Error fetching response. Please try again.' }]);
     } finally {
       setLoading(false);
+      setQuery('');
     }
+  };
+
+  const handleReset = () => {
+    setConversation([]);
+    setQuery('');
+    setJurisdiction('');
   };
 
   return (
@@ -64,24 +83,34 @@ function App() {
             <option value="">Select a state</option>
             <option value="Federal">Federal</option>
             {allStates.map((state) => (
-              <option key={state} value={state}>
-                {state}
-              </option>
+              <option key={state} value={state}>{state}</option>
             ))}
           </select>
         </div>
 
-        <button type="submit" disabled={!query || !jurisdiction || loading}>
-          {loading ? 'Processing...' : 'Submit'}
-        </button>
+        <div className="button-row">
+          <button type="submit" disabled={!query || !jurisdiction || loading} className="submit" style={{ marginRight: '10px' }}>
+            {loading ? 'Processing...' : 'Submit'}
+          </button>
+          <button type="button" className="reset" onClick={handleReset}>
+            Start Over
+          </button>
+        </div>
       </form>
 
-      {response && (
-        <div
-          className="response"
-          dangerouslySetInnerHTML={{ __html: response }}
-        ></div>
-      )}
+      <div className="response">
+        {conversation.map((msg, index) => (
+          <div
+            key={index}
+            className={
+              msg.role === 'user' ? 'user-msg' :
+              msg.role === 'followup' ? 'followup-msg' :
+              msg.role === 'error' ? 'error-msg' : 'ai-msg'
+            }
+            dangerouslySetInnerHTML={{ __html: msg.text }}
+          ></div>
+        ))}
+      </div>
     </div>
   );
 }
