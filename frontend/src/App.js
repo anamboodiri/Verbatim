@@ -24,7 +24,7 @@ function App() {
     if (!query || !jurisdiction) return;
 
     setLoading(true);
-    const userMessage = { role: 'user', text: query };
+    const userMessage = { role: 'user', text: `<strong>Legal Query:</strong> ${query}` };
     setConversation((prev) => [...prev, userMessage]);
 
     try {
@@ -37,12 +37,18 @@ function App() {
       const isFollowUp = /clarify|do you mean|more detail|unsure|unclear/i.test(aiText);
       const aiMessage = {
         role: isFollowUp ? 'followup' : 'ai',
-        text: aiText
+        text: `<strong>Response:</strong> ${aiText}`
       };
 
       setConversation((prev) => [...prev, aiMessage]);
     } catch (error) {
-      setConversation((prev) => [...prev, { role: 'error', text: '❌ Error fetching response. Please try again.' }]);
+      const status = error.response?.status;
+      const message =
+        status === 529 || status === 503
+          ? '🚦 Our servers are temporarily overloaded. Please wait a moment and try again.'
+          : '❌ An unexpected error occurred. Please try again later.';
+
+      setConversation((prev) => [...prev, { role: 'error', text: message }]);
     } finally {
       setLoading(false);
       setQuery('');

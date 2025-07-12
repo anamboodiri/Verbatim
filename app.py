@@ -11,10 +11,8 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# Get API key from environment variable
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 
-# Check if API key is loaded
 if not ANTHROPIC_API_KEY:
     print("❌ ERROR: ANTHROPIC_API_KEY not found in environment variables")
     exit(1)
@@ -50,7 +48,8 @@ They want an answer based on **{jurisdiction}** law. Provide:
    - https://codes.findlaw.com/
    - https://www.ncsl.org/civil-and-criminal-justice/policing-legislation-database
 
-If the user query is ambiguous or lacks detail, respond only with a clarifying question before attempting an answer.
+Only ask a clarifying question if the query is genuinely too vague to determine applicable law. 
+If the user's question contains a specific scenario or clearly refers to a known legal doctrine or fact pattern, answer it directly using case law and statutes. Avoid unnecessary clarifying questions.
 """
 
     headers = {
@@ -68,6 +67,9 @@ If the user query is ambiguous or lacks detail, respond only with a clarifying q
     try:
         response = requests.post("https://api.anthropic.com/v1/messages", headers=headers, json=payload)
 
+        if response.status_code == 529:
+            return jsonify({"response": "🚦 Our servers are temporarily overloaded. Please wait a moment and try again."}), 503
+
         if response.status_code != 200:
             print(f"❌ API Error: {response.status_code} - {response.text}")
             return jsonify({
@@ -81,7 +83,7 @@ If the user query is ambiguous or lacks detail, respond only with a clarifying q
         if "content" in result and len(result["content"]) > 0:
             raw_text = result["content"][0]["text"]
 
-            # Clean up formatting
+            # Clean formatting
             formatted = raw_text.replace("\n\n", "<br><br>").replace("\n- ", "<br>• ").replace("\n", "<br>")
             formatted = formatted.replace("1. ", "<br><strong>1. ").replace("2. ", "</strong><br><strong>2. ")
             formatted = formatted.replace("3. ", "</strong><br><strong>3. ").replace("4. ", "</strong><br><strong>4. ")
@@ -90,7 +92,6 @@ If the user query is ambiguous or lacks detail, respond only with a clarifying q
             # Make URLs clickable
             formatted = re.sub(r'(https?://[^\s<]+)', r'<a href="\1" target="_blank">\1</a>', formatted)
 
-            # Remove unnecessary filler text from Claude
             formatted = formatted.replace(
                 "Unfortunately I'm unable to directly access the provided links at this time.", ""
             )
